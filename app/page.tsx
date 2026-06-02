@@ -7,6 +7,7 @@ export type dv = typeof DeviceOrientationEvent & {
     requestPermission?: () => Promise<"granted" | "denied">;
 };
 export default function CompassPage() {
+
     async function enableCompass() {
         try {
             const DeviceOrientationEventIOS =
@@ -31,7 +32,7 @@ export default function CompassPage() {
     }, []);
 
     return (
-        <div className="">
+        <div className="w-full h-screen bg-[linear-gradient(64deg,#0c0368a8,#0000ff96)]">
             <Compass/>
         </div>
     );

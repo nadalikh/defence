@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useCompass } from "@/components/compass/hooks/useCompass";
-const HEADING_TIMEOUT_MS = 3000; // 3 seconds
+import {useEffect, useRef, useState} from "react";
+import {useCompass} from "@/components/compass/hooks/useCompass";
+import NumberRangeSelector from "@/components/rangeSelector/rangeSelector";
+import F35Jet from "@/components/compass/f35";
+import Uav from "@/components/compass/uav";
+import Transportation from "@/components/compass/transportation";
+import Rocket from "@/components/compass/rocket";
+import Helicopter from "@/components/compass/helicopter";
+import Fpv from "@/components/compass/fpv";
+
+
 const renderTicks = () => {
     const ticks = [];
     for (let angle = 0; angle < 360; angle += 10) {
@@ -44,44 +52,13 @@ const renderTicks = () => {
 };
 
 export default function Compass() {
-    const heading = useCompass();
+    const {heading, start, isActivate, stop, setHeading, setIsActivate} = useCompass();
     const [continuousRotation, setContinuousRotation] = useState(0);
-    const [hasOrientation, setHasOrientation] = useState(true);
     const prevHeadingRef = useRef<number | null>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const alertShownRef = useRef(false); // prevent multiple alerts
 
     useEffect(() => {
-        // If heading is valid, clear any pending timeout and reset alert flag
-        if (heading !== null && heading !== undefined) {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-            alertShownRef.current = false;
-            return;
-        }
-
-        // Heading is still null/undefined – set a timeout to alert after the delay
-        if (!alertShownRef.current && !timeoutRef.current) {
-            timeoutRef.current = setTimeout(() => {
-                if (heading === null || heading === undefined) {
-                    alert(`Heading not set within ${HEADING_TIMEOUT_MS / 1000} seconds`);
-                    alertShownRef.current = true;
-                    setHasOrientation(false)
-                }
-                timeoutRef.current = null;
-            }, HEADING_TIMEOUT_MS);
-        }
-
-        // Cleanup when heading changes or component unmounts
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
-    }, [heading]); // Re-run this effect every time heading changes
+        start()
+    }, []);
 
     useEffect(() => {
         if (heading === null || heading === undefined) return;
@@ -107,18 +84,19 @@ export default function Compass() {
         prevHeadingRef.current = heading;
     }, [heading]);
 
-    return  (
-        <div className="flex flex-col items-center gap-6 p-4">
-            <div className="relative w-[200px] h-[200px]">
+    return (
+        <div className="flex flex-col items-center gap-6 p-4 relative border border-red-900">
+            <div className="relative w-50 h-[200px]">
                 {/* Fixed pointer (lubber line) */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                    <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-red-600 drop-shadow-md"></div>
+                    <div
+                        className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-red-600 drop-shadow-md"></div>
                 </div>
 
                 {/* Rotating compass card with ticks */}
                 <div
-                    className="relative w-full h-full rounded-full border-2 border-gray-800 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg transition-transform duration-100 ease-linear"
-                    style={{ transform: `rotate(${continuousRotation}deg)` }}
+                    className="relative w-full h-full rounded-full bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg transition-transform duration-100 ease-linear"
+                    style={{transform: `rotate(${continuousRotation}deg)`}}
                 >
                     {/* Tick marks (SVG) */}
                     <svg
@@ -129,30 +107,58 @@ export default function Compass() {
                     </svg>
 
                     {/* N S E W labels */}
-                    <div className="absolute top-1 left-1/2 -translate-x-1/2 text-red-600 font-bold text-lg drop-shadow-sm z-10">N</div>
-                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-gray-700 font-semibold text-lg drop-shadow-sm z-10">S</div>
-                    <div className="absolute right-1 top-1/2 -translate-y-1/2 text-blue-600 font-semibold text-lg drop-shadow-sm z-10">E</div>
-                    <div className="absolute left-1 top-1/2 -translate-y-1/2 text-emerald-600 font-semibold text-lg drop-shadow-sm z-10">W</div>
+                    <div
+                        className="absolute top-1 left-1/2 -translate-x-1/2 text-red-600 font-bold text-lg drop-shadow-sm z-10">N
+                    </div>
+                    <div
+                        className="absolute bottom-1 left-1/2 -translate-x-1/2 text-gray-700 font-semibold text-lg drop-shadow-sm z-10">S
+                    </div>
+                    <div
+                        className="absolute right-1 top-1/2 -translate-y-1/2 text-blue-600 font-semibold text-lg drop-shadow-sm z-10">E
+                    </div>
+                    <div
+                        className="absolute left-1 top-1/2 -translate-y-1/2 text-emerald-600 font-semibold text-lg drop-shadow-sm z-10">W
+                    </div>
 
                     {/* Center icon – compass rose */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-700 z-10">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L14 9L12 11L10 9L12 2Z" fill="currentColor" />
-                            <path d="M12 22L10 15L12 13L14 15L12 22Z" fill="currentColor" />
-                            <path d="M22 12L15 14L13 12L15 10L22 12Z" fill="currentColor" />
-                            <path d="M2 12L9 10L11 12L9 14L2 12Z" fill="currentColor" />
-                            <circle cx="12" cy="12" r="2" fill="currentColor" />
+                            <path d="M12 2L14 9L12 11L10 9L12 2Z" fill="currentColor"/>
+                            <path d="M12 22L10 15L12 13L14 15L12 22Z" fill="currentColor"/>
+                            <path d="M22 12L15 14L13 12L15 10L22 12Z" fill="currentColor"/>
+                            <path d="M2 12L9 10L11 12L9 14L2 12Z" fill="currentColor"/>
+                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
                         </svg>
                     </div>
 
                     {/* Decorative inner ring */}
-                    <div className="absolute inset-2 rounded-full border border-gray-200 pointer-events-none"></div>
+                    <div className="absolute inset-2 rounded-full pointer-events-none"></div>
                 </div>
             </div>
-
-            <p className="text-xl font-mono font-medium bg-gray-100 px-4 py-1.5 rounded-full shadow-inner">
-                Heading: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
+            <p className="bg-gray-100 px-4 py-1.5 rounded-full shadow-inner">
+                درجه: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
             </p>
+            <div className={'flex flex-col gap-3 absolute top-2 left-5.5'}>
+
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><F35Jet/></button>
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Uav/></button>
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Transportation/></button>
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Rocket/></button>
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Helicopter/></button>
+                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Fpv/></button>
+            </div>
+            <div className={'flex flex-col gap-3 absolute top-2 right-5.5'}>
+                <button
+                    onClick={() => setIsActivate(!isActivate)}
+                    className={'text-xs hover:cursor-pointer p-3 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? 'قطب نما دستی' : 'قطب نما خودکار'}
+                </button>
+            </div>
+            {
+                !isActivate &&
+                <div className={'mt-4 w-full border flex justify-center border-black'}>
+                    <NumberRangeSelector onChange={value => setHeading(value)}/>
+                </div>
+            }
         </div>
     );
 }
