@@ -85,7 +85,7 @@ export default function Compass() {
     }, [heading]);
 
     return (
-        <div className="flex flex-col items-center gap-6 p-4 relative border border-red-900">
+        <div className="flex flex-col items-center gap-6 p-4 relative">
             <div className="relative w-50 h-[200px]">
                 {/* Fixed pointer (lubber line) */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
@@ -155,7 +155,7 @@ export default function Compass() {
             </div>
             {
                 !isActivate &&
-                <div className={'mt-4 w-full border flex justify-center border-black'}>
+                <div className={'mt-4 w-full border flex justify-center '}>
                     <NumberRangeSelector onChange={value => setHeading(value)}/>
                 </div>
             }
