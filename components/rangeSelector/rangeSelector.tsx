@@ -32,7 +32,7 @@ const NumberRangeSelector: React.FC<NumberRangeSelectorProps> = ({
     };
 
     return (
-        <div className="w-full max-w-md rounded-xl border border-gray-200 bg-[#d1d1d1] p-2  shadow-md ">
+        <div className="w-full max-w-md rounded-xl bg-[#d1d1d1] p-2  shadow-md ">
 
             {/* Current value display */}
             <div className="mb-5 text-center">
