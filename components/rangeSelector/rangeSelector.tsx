@@ -16,17 +16,8 @@ const NumberRangeSelector: React.FC<NumberRangeSelectorProps> = ({
                                                                  }) => {
     const [value, setValue] = useState<number>(initialValue);
 
-    const clamp = (num: number): number => Math.min(360, Math.max(0, num));
-
     const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVal = parseFloat(e.target.value);
-        setValue(newVal);
-        onChange?.(newVal);
-    };
-
-    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const raw = parseFloat(e.target.value);
-        const newVal = clamp(isNaN(raw) ? 0 : raw);
         setValue(newVal);
         onChange?.(newVal);
     };

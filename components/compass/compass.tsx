@@ -155,7 +155,7 @@ export default function Compass() {
             </div>
             {
                 !isActivate &&
-                <div className={'mt-4 w-full border flex justify-center '}>
+                <div className={'mt-7 w-full flex justify-center '}>
                     <NumberRangeSelector onChange={value => setHeading(value)}/>
                 </div>
             }
