@@ -3,6 +3,7 @@ import "./globals.css";
 import React from "react";
 import Image from "next/image";
 import localFont from "next/font/local";
+import {ToastContainer} from "react-toastify";
 export const metadata: Metadata = {
     title: "defence",
 };
@@ -23,6 +24,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
             className={`h-full ${font.variable} ${font.className}`}
         >
             <body className={"min-h-full flex flex-col max-w-150 m-auto relative "}>
+                <ToastContainer />
                 <Image fill sizes={'auto'} loading="eager" className={'-z-20'} src={'/images/background1.jpg'} alt="background"/>
                 {children}
             </body>

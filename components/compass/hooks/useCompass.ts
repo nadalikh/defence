@@ -1,5 +1,6 @@
 // hooks/useCompass.ts
 import {useCallback, useEffect, useRef, useState} from "react";
+import {notif} from "@/components/utils";
 
 interface IOSDeviceOrientationEvent extends DeviceOrientationEvent {
     webkitCompassHeading?: number;
@@ -65,7 +66,7 @@ export function useCompass() {
         if (!alertShownRef.current && !timeoutRef.current) {
             timeoutRef.current = setTimeout(() => {
                 if (heading === null || heading === undefined) {
-                    alert(`Heading not set within ${HEADING_TIMEOUT_MS / 1000} seconds`);
+                    notif(`سخت افزار قطب نما در دستگاه شما یافت نشد`, true);
                     alertShownRef.current = true;
                     setIsActivate(false)
                 }

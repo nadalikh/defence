@@ -9,6 +9,8 @@ import Transportation from "@/components/compass/transportation";
 import Rocket from "@/components/compass/rocket";
 import Helicopter from "@/components/compass/helicopter";
 import Fpv from "@/components/compass/fpv";
+import Automatic from "@/components/compass/automatic";
+import Setting from "@/components/compass/setting";
 
 enum Weaopon {
     warPlaneFighter = "warPlaneFighter",
@@ -23,8 +25,6 @@ interface SelectedWeaponComponent {
     component?: React.ReactNode,
     info?: string,
 }
-
-const SELECTED_SIZE_IN_LIST = "50PX"
 const SELECTED_SIZE_COMPONENT = "130PX"
 
 const renderTicks = () => {
@@ -132,11 +132,13 @@ export default function Compass() {
             selectedWeaponComponent.component = <Transportation width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
             selectedWeaponComponent.info = "ترابری"
     }
-    // alert(`${isWarPlane} ${isRocket}  ${isHelicopter} ${isFpv} ${isUav} ${isTransportation}`)
-    console.log("test", isWarPlane, isRocket, isHelicopter, isFpv, isUav, isTransportation)
     return (
         <div className="flex flex-col items-center gap-6 p-4 relative">
-            <div className="relative w-50 h-[200px]">
+            <button
+                onClick={() => setIsActivate(!isActivate)}
+                className={'absolute top-0 right-0 text-xs mr-2 mt-2 hover:cursor-pointer p-1.5 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? <Setting /> : <Automatic />}
+            </button>
+            <div className="relative w-[150px] h-[150px]">
                 {/* Fixed pointer (lubber line) */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                     <div
@@ -188,7 +190,7 @@ export default function Compass() {
             <p className="bg-gray-100 px-4 py-1.5 rounded-full shadow-inner">
                 درجه: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
             </p>
-            <div className={'flex flex-col gap-3 absolute top-2 left-5.5'}>
+            <div className={'flex flex-row gap-3'}>
                 <button onClick={() => setSelectedWeapon(Weaopon.warPlaneFighter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isWarPlane ? "border border-red-900" : ""}`}><F35Jet /></button>
                 <button onClick={() => setSelectedWeapon(Weaopon.uav)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isUav ? "border border-red-900" : ""}`}><Uav/></button>
                 <button onClick={() => setSelectedWeapon(Weaopon.transportation)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isTransportation ? "border border-red-900" : ""}`}><Transportation /></button>
@@ -196,11 +198,7 @@ export default function Compass() {
                 <button onClick={() => setSelectedWeapon(Weaopon.helicopter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isHelicopter ? "border border-red-900" : ""}`}><Helicopter/></button>
                 <button onClick={() => setSelectedWeapon(Weaopon.fpv)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isFpv ? "border border-red-900" : ""}`}><Fpv/></button>
             </div>
-            <div className={'flex flex-col absolute top-2 right-0'}>
-                <button
-                    onClick={() => setIsActivate(!isActivate)}
-                    className={'text-xs mr-2 w-[120px] max-w-[120px] hover:cursor-pointer p-3 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? 'قطب نما دستی' : 'قطب نما خودکار'}
-                </button>
+            <div className={'flex flex-col rounded-2xl bg-[#d1d1d1] '}>
                 <div className={'mt-4'}>
                     {selectedWeaponComponent.component}
                     <span className={'text-center block w-full'}>{selectedWeaponComponent.info}</span>
