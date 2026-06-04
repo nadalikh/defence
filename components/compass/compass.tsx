@@ -10,6 +10,22 @@ import Rocket from "@/components/compass/rocket";
 import Helicopter from "@/components/compass/helicopter";
 import Fpv from "@/components/compass/fpv";
 
+enum Weaopon {
+    warPlaneFighter = "warPlaneFighter",
+    rocket = "rocket",
+    uav = "uav",
+    fpv = "fpv",
+    transportation = "transportation",
+    helicopter = "helicopter",
+}
+
+interface SelectedWeaponComponent {
+    component?: React.ReactNode,
+    info?: string,
+}
+
+const SELECTED_SIZE_IN_LIST = "50PX"
+const SELECTED_SIZE_COMPONENT = "130PX"
 
 const renderTicks = () => {
     const ticks = [];
@@ -54,6 +70,7 @@ const renderTicks = () => {
 export default function Compass() {
     const {heading, start, isActivate, stop, setHeading, setIsActivate} = useCompass();
     const [continuousRotation, setContinuousRotation] = useState(0);
+    const [selectedWeapon, setSelectedWeapon] = useState<Weaopon | undefined>(undefined);
     const prevHeadingRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -83,7 +100,40 @@ export default function Compass() {
         // Store current heading for next update
         prevHeadingRef.current = heading;
     }, [heading]);
-
+    const isWarPlane = selectedWeapon === Weaopon.warPlaneFighter
+    const isRocket = selectedWeapon === Weaopon.rocket
+    const isHelicopter = selectedWeapon === Weaopon.helicopter
+    const isFpv = selectedWeapon === Weaopon.fpv
+    const isUav = selectedWeapon === Weaopon.uav
+    const isTransportation = selectedWeapon === Weaopon.transportation
+    const selectedWeaponComponent: SelectedWeaponComponent = {}
+    switch (selectedWeapon) {
+        case Weaopon.warPlaneFighter:
+            selectedWeaponComponent.component = <F35Jet width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "جنگنده"
+            break;
+        case Weaopon.rocket:
+            selectedWeaponComponent.component = <Rocket width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "راکت"
+            break;
+        case Weaopon.fpv:
+            selectedWeaponComponent.component = <Fpv width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "FPV"
+            break;
+        case Weaopon.uav:
+            selectedWeaponComponent.component = <Uav width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "پهباد"
+            break;
+        case Weaopon.helicopter:
+            selectedWeaponComponent.component = <Helicopter width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "هلیکوتر"
+            break;
+        case Weaopon.transportation:
+            selectedWeaponComponent.component = <Transportation width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+            selectedWeaponComponent.info = "ترابری"
+    }
+    // alert(`${isWarPlane} ${isRocket}  ${isHelicopter} ${isFpv} ${isUav} ${isTransportation}`)
+    console.log("test", isWarPlane, isRocket, isHelicopter, isFpv, isUav, isTransportation)
     return (
         <div className="flex flex-col items-center gap-6 p-4 relative">
             <div className="relative w-50 h-[200px]">
@@ -139,19 +189,22 @@ export default function Compass() {
                 درجه: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
             </p>
             <div className={'flex flex-col gap-3 absolute top-2 left-5.5'}>
-
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><F35Jet/></button>
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Uav/></button>
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Transportation/></button>
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Rocket/></button>
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Helicopter/></button>
-                <button className={'hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center'}><Fpv/></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.warPlaneFighter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isWarPlane ? "border border-red-900" : ""}`}><F35Jet /></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.uav)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isUav ? "border border-red-900" : ""}`}><Uav/></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.transportation)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isTransportation ? "border border-red-900" : ""}`}><Transportation /></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.rocket)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isRocket ? "border border-red-900" : ""}`}><Rocket /></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.helicopter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isHelicopter ? "border border-red-900" : ""}`}><Helicopter/></button>
+                <button onClick={() => setSelectedWeapon(Weaopon.fpv)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isFpv ? "border border-red-900" : ""}`}><Fpv/></button>
             </div>
-            <div className={'flex flex-col gap-3 absolute top-2 right-5.5'}>
+            <div className={'flex flex-col absolute top-2 right-0'}>
                 <button
                     onClick={() => setIsActivate(!isActivate)}
-                    className={'text-xs hover:cursor-pointer p-3 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? 'قطب نما دستی' : 'قطب نما خودکار'}
+                    className={'text-xs mr-2 w-[120px] max-w-[120px] hover:cursor-pointer p-3 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? 'قطب نما دستی' : 'قطب نما خودکار'}
                 </button>
+                <div className={'mt-4'}>
+                    {selectedWeaponComponent.component}
+                    <span className={'text-center block w-full'}>{selectedWeaponComponent.info}</span>
+                </div>
             </div>
             {
                 !isActivate &&
