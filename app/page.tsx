@@ -2,6 +2,8 @@
 
 import {useEffect, useState} from "react";
 import Compass from "@/components/compass/compass";
+import dynamic from "next/dynamic";
+const Mapp = dynamic(() => import("@/components/map/map"), {ssr: false});
 
 export type dv = typeof DeviceOrientationEvent & {
     requestPermission?: () => Promise<"granted" | "denied">;
@@ -27,13 +29,15 @@ export default function CompassPage() {
             console.error(error);
         }
     }
+
     useEffect(() => {
         enableCompass()
     }, []);
 
     return (
-        <div className="w-full h-screen bg-[linear-gradient(64deg,#0c0368a8,#0000ff96)]">
+        <div className="w-full min-h-screen bg-[linear-gradient(64deg,#0c0368a8,#0000ff96)]">
             <Compass/>
+            <Mapp/>
         </div>
     );
 }

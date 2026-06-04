@@ -126,7 +126,7 @@ export default function Compass() {
             break;
         case Weaopon.helicopter:
             selectedWeaponComponent.component = <Helicopter width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
-            selectedWeaponComponent.info = "هلیکوتر"
+            selectedWeaponComponent.info = "هلیکوپتر"
             break;
         case Weaopon.transportation:
             selectedWeaponComponent.component = <Transportation width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />

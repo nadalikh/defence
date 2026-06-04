@@ -23,7 +23,7 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
             dir={'rtl'}
             className={`h-full ${font.variable} ${font.className}`}
         >
-            <body className={"min-h-full flex flex-col max-w-150 m-auto relative "}>
+            <body className={"flex flex-col max-w-150 m-auto relative "}>
                 <ToastContainer />
                 <Image fill sizes={'auto'} loading="eager" className={'-z-20'} src={'/images/background1.jpg'} alt="background"/>
                 {children}
