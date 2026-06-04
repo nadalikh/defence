@@ -66,7 +66,7 @@ export function useCompass() {
         if (!alertShownRef.current && !timeoutRef.current) {
             timeoutRef.current = setTimeout(() => {
                 if (heading === null || heading === undefined) {
-                    notif(`سخت افزار قطب نما در دستگاه شما یافت نشد`, true);
+                    notif(`سخت افزار قطب نما در دستگاه شما یافت نشد.`, true);
                     alertShownRef.current = true;
                     setIsActivate(false)
                 }
