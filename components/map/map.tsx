@@ -59,7 +59,7 @@ export default function Mapp() {
 
     };
     return (
-        <div className={"min-h-[30vh] h-[30vh]"}>
+        <div className={"min-h-[30vh] h-[30vh] mt-auto"}>
             <NeshanMap
                 mapKey="web.90736ba0532f4b04a51f845ed958354b"
                 defaultType="dreamy"

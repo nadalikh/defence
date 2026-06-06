@@ -11,8 +11,10 @@ import Helicopter from "@/components/compass/helicopter";
 import Fpv from "@/components/compass/fpv";
 import Automatic from "@/components/compass/automatic";
 import Setting from "@/components/compass/setting";
+import Unknown from "@/components/compass/unknown";
 
-enum Weaopon {
+enum Weapon {
+    unKnown = 'unKnown',
     warPlaneFighter = "warPlaneFighter",
     rocket = "rocket",
     uav = "uav",
@@ -25,6 +27,7 @@ interface SelectedWeaponComponent {
     component?: React.ReactNode,
     info?: string,
 }
+
 const SELECTED_SIZE_COMPONENT = "130PX"
 
 const renderTicks = () => {
@@ -33,8 +36,6 @@ const renderTicks = () => {
         let length = 6; // short tick for 10°
         let strokeWidth = 1;
         let color = "#9ca3af"; // gray-400
-
-        // Longer ticks for every 30°, and even longer for cardinal points
         if (angle % 90 === 0) {
             continue;
         } else if (angle % 30 === 0) {
@@ -42,14 +43,9 @@ const renderTicks = () => {
             strokeWidth = 1.5;
             color = "#6b7280"; // gray-500
         }
-
-        // Calculate start and end points for the tick line
-        // The SVG center is (0,0), radius ≈ 90 (since container is 200px, so 100px radius; we leave 10px margin)
         const startRadius = 86;
         const endRadius = startRadius - length;
 
-        // In SVG, line from (0, -startRadius) to (0, -endRadius), then rotated by angle
-        // We'll use a <g transform="rotate(angle)"> for each tick
         ticks.push(
             <g key={angle} transform={`rotate(${angle})`}>
                 <line
@@ -70,7 +66,7 @@ const renderTicks = () => {
 export default function Compass() {
     const {heading, start, isActivate, stop, setHeading, setIsActivate} = useCompass();
     const [continuousRotation, setContinuousRotation] = useState(0);
-    const [selectedWeapon, setSelectedWeapon] = useState<Weaopon | undefined>(undefined);
+    const [selectedWeapon, setSelectedWeapon] = useState<Weapon>(Weapon.unKnown);
     const prevHeadingRef = useRef<number | null>(null);
 
     useEffect(() => {
@@ -79,86 +75,83 @@ export default function Compass() {
 
     useEffect(() => {
         if (heading === null || heading === undefined) return;
-
-        // Initialize previous heading on first valid reading
         if (prevHeadingRef.current === null) {
             prevHeadingRef.current = heading;
             setContinuousRotation(-heading);
             return;
         }
-
-        // Calculate the smallest angular difference between new and old heading
         let delta = heading - prevHeadingRef.current;
-
-        // Normalize delta to the range [-180, 180) to get the shortest rotation direction
         if (delta > 180) delta -= 360;
         if (delta < -180) delta += 360;
 
-        // Update continuous rotation angle (accumulate the delta)
         setContinuousRotation(prev => prev - delta);
 
-        // Store current heading for next update
         prevHeadingRef.current = heading;
     }, [heading]);
-    const isWarPlane = selectedWeapon === Weaopon.warPlaneFighter
-    const isRocket = selectedWeapon === Weaopon.rocket
-    const isHelicopter = selectedWeapon === Weaopon.helicopter
-    const isFpv = selectedWeapon === Weaopon.fpv
-    const isUav = selectedWeapon === Weaopon.uav
-    const isTransportation = selectedWeapon === Weaopon.transportation
+    const isWarPlane = selectedWeapon === Weapon.warPlaneFighter
+    const isRocket = selectedWeapon === Weapon.rocket
+    const isHelicopter = selectedWeapon === Weapon.helicopter
+    const isFpv = selectedWeapon === Weapon.fpv
+    const isUnknown = selectedWeapon === Weapon.unKnown
+    const isUav = selectedWeapon === Weapon.uav
+    const isTransportation = selectedWeapon === Weapon.transportation
     const selectedWeaponComponent: SelectedWeaponComponent = {}
     switch (selectedWeapon) {
-        case Weaopon.warPlaneFighter:
-            selectedWeaponComponent.component = <F35Jet width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.warPlaneFighter:
+            selectedWeaponComponent.component =
+                <F35Jet width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "جنگنده"
             break;
-        case Weaopon.rocket:
-            selectedWeaponComponent.component = <Rocket width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.rocket:
+            selectedWeaponComponent.component =
+                <Rocket width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "راکت"
             break;
-        case Weaopon.fpv:
-            selectedWeaponComponent.component = <Fpv width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.fpv:
+            selectedWeaponComponent.component = <Fpv width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "FPV"
             break;
-        case Weaopon.uav:
-            selectedWeaponComponent.component = <Uav width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.uav:
+            selectedWeaponComponent.component = <Uav width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "پهباد"
             break;
-        case Weaopon.helicopter:
-            selectedWeaponComponent.component = <Helicopter width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.helicopter:
+            selectedWeaponComponent.component =
+                <Helicopter width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "هلیکوپتر"
             break;
-        case Weaopon.transportation:
-            selectedWeaponComponent.component = <Transportation width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT} />
+        case Weapon.transportation:
+            selectedWeaponComponent.component =
+                <Transportation width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
             selectedWeaponComponent.info = "ترابری"
+            break;
+        case Weapon.unKnown:
+            selectedWeaponComponent.component =
+                <Unknown width={SELECTED_SIZE_COMPONENT} height={SELECTED_SIZE_COMPONENT}/>
+            selectedWeaponComponent.info = "ناشناخته"
     }
     return (
         <div className="flex flex-col items-center gap-6 p-4 relative">
             <button
                 onClick={() => setIsActivate(!isActivate)}
-                className={'absolute top-0 right-0 text-xs mr-2 mt-2 hover:cursor-pointer p-1.5 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ? <Setting /> : <Automatic />}
+                className={'absolute top-0 right-0 text-xs mr-2 mt-2 hover:cursor-pointer p-1.5 rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800'}>{isActivate ?
+                <Setting/> : <Automatic/>}
             </button>
-            <div className="relative w-[150px] h-[150px]">
-                {/* Fixed pointer (lubber line) */}
+            <div className="relative w-[200px] h-[200px]">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                     <div
                         className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-red-600 drop-shadow-md"></div>
                 </div>
-
-                {/* Rotating compass card with ticks */}
                 <div
                     className="relative w-full h-full rounded-full bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg transition-transform duration-100 ease-linear"
                     style={{transform: `rotate(${continuousRotation}deg)`}}
                 >
-                    {/* Tick marks (SVG) */}
                     <svg
                         viewBox="-100 -100 200 200"
                         className="absolute inset-0 w-full h-full pointer-events-none"
                     >
                         {renderTicks()}
                     </svg>
-
-                    {/* N S E W labels */}
                     <div
                         className="absolute top-1 left-1/2 -translate-x-1/2 text-red-600 font-bold text-lg drop-shadow-sm z-10">N
                     </div>
@@ -171,8 +164,6 @@ export default function Compass() {
                     <div
                         className="absolute left-1 top-1/2 -translate-y-1/2 text-emerald-600 font-semibold text-lg drop-shadow-sm z-10">W
                     </div>
-
-                    {/* Center icon – compass rose */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-700 z-10">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2L14 9L12 11L10 9L12 2Z" fill="currentColor"/>
@@ -182,8 +173,6 @@ export default function Compass() {
                             <circle cx="12" cy="12" r="2" fill="currentColor"/>
                         </svg>
                     </div>
-
-                    {/* Decorative inner ring */}
                     <div className="absolute inset-2 rounded-full pointer-events-none"></div>
                 </div>
             </div>
@@ -191,12 +180,27 @@ export default function Compass() {
                 درجه: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
             </p>
             <div className={'flex flex-row gap-3'}>
-                <button onClick={() => setSelectedWeapon(Weaopon.warPlaneFighter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isWarPlane ? "border border-red-900" : ""}`}><F35Jet /></button>
-                <button onClick={() => setSelectedWeapon(Weaopon.uav)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isUav ? "border border-red-900" : ""}`}><Uav/></button>
-                <button onClick={() => setSelectedWeapon(Weaopon.transportation)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isTransportation ? "border border-red-900" : ""}`}><Transportation /></button>
-                <button onClick={() => setSelectedWeapon(Weaopon.rocket)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isRocket ? "border border-red-900" : ""}`}><Rocket /></button>
-                <button onClick={() => setSelectedWeapon(Weaopon.helicopter)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isHelicopter ? "border border-red-900" : ""}`}><Helicopter/></button>
-                <button onClick={() => setSelectedWeapon(Weaopon.fpv)} className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isFpv ? "border border-red-900" : ""}`}><Fpv/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.warPlaneFighter)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isWarPlane ? "border border-red-900" : ""}`}>
+                    <F35Jet/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.uav)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isUav ? "border border-red-900" : ""}`}>
+                    <Uav/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.transportation)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isTransportation ? "border border-red-900" : ""}`}>
+                    <Transportation/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.rocket)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isRocket ? "border border-red-900" : ""}`}>
+                    <Rocket/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.helicopter)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isHelicopter ? "border border-red-900" : ""}`}>
+                    <Helicopter/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.fpv)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isFpv ? "border border-red-900" : ""}`}>
+                    <Fpv/></button>
+                <button onClick={() => setSelectedWeapon(Weapon.unKnown)}
+                        className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center items-center ${isUnknown ? "border border-red-900" : ""}`}>
+                    <Unknown/></button>
             </div>
             <div className={'flex flex-col rounded-2xl bg-[#d1d1d1] '}>
                 <div className={'mt-4'}>

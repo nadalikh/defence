@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const Helicopter = ({
+const Helicopter = ({
                                width = "40px",
                                height = "40px",
                                className = ""

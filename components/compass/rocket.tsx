@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const Rocket = ({
+const Rocket = ({
                            width = "40px",
                            height = "40px",
                            className = ""

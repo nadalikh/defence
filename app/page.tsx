@@ -35,7 +35,7 @@ export default function CompassPage() {
     }, []);
 
     return (
-        <div className="w-full min-h-screen bg-[linear-gradient(64deg,#0c0368a8,#0000ff96)]">
+        <div className="w-full min-h-screen bg-[linear-gradient(64deg,#0c0368a8,#0000ff96)] flex flex-col">
             <Compass/>
             <Mapp/>
         </div>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const F35Jet = ({
+const F35Jet = ({
                            width = "40px",
                            height = "40px",
                            className = ""

@@ -19,7 +19,6 @@ export function useCompass() {
     const alertShownRef = useRef(false); // prevent multiple alerts
 
     const start = useCallback(() => {
-        console.log("start", isActivate)
         window.addEventListener('deviceorientation', handlerRef.current, true);
         setIsActivate(true);
     }, [isActivate]);
@@ -29,7 +28,6 @@ export function useCompass() {
     }, [isActivate]);
 
     useEffect(() => {
-        // alert(`${prevIsActivate.current} ${!isActivate}`)
         if (prevIsActivate.current && !isActivate)
             stop()
         else if (!prevIsActivate.current && isActivate || !prevIsActivate.current && !isActivate)
@@ -51,7 +49,6 @@ export function useCompass() {
             }
         };
     }, []);
-
     useEffect(() => {
         if (heading !== null && heading !== undefined) {
             if (timeoutRef.current) {
@@ -61,7 +58,6 @@ export function useCompass() {
             alertShownRef.current = false;
             return;
         }
-
         console.log("heading", heading, isActivate, alertShownRef, timeoutRef);
         if (!alertShownRef.current && !timeoutRef.current) {
             timeoutRef.current = setTimeout(() => {
@@ -73,15 +69,13 @@ export function useCompass() {
                 timeoutRef.current = null;
             }, HEADING_TIMEOUT_MS);
         }
-
-        // Cleanup when heading changes or component unmounts
         return () => {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
                 timeoutRef.current = null;
             }
         };
-    }, [heading]); // Re-run this effect every time heading changes
+    }, [heading]);
 
 
     return {heading, start, stop, isActivate, setHeading, setIsActivate};

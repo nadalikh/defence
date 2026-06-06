@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const FpvDrone = ({
+const FpvDrone = ({
                              width = "40px",
                              height = "40px",
                              className = ""

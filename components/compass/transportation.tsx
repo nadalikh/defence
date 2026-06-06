@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-export const TransportPlane = ({
+const TransportPlane = ({
                                    width = "40px",
                                    height = "40px",
                                    className = ""
