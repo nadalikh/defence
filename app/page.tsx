@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import Compass from "@/components/compass/compass";
 import dynamic from "next/dynamic";
 const Mapp = dynamic(() => import("@/components/map/map"), {ssr: false});

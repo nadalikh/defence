@@ -22,7 +22,7 @@ export default function Login() {
     }
 
     return (
-        <div className="bg-[#80a6c89c] border border-blue-900 shadow-2xl shadow-black rounded-lg w-3/4 p-5 absolute top-1/2 left-1/2 transform -translate-1/2">
+        <div className="bg-[#00437ebd] border border-blue-900 shadow-2xl shadow-black rounded-lg w-3/4 p-5 absolute top-1/2 left-1/2 transform -translate-1/2">
             <Input label={'موبایل'} value={mobile} error={hasMobileError ? mobileValidationError : undefined} onChange={changePassword} placeholder="09*********"/>
             <div className={wrapperStyle}>
                 <PasswordInput label={'پسورد'} value={password} onChange={setPassword} placeholder={'******'}/>

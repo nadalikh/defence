@@ -53,7 +53,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 {label && (
                     <label
                         htmlFor={inputId}
-                        className="block text-right text-sm font-medium text-gray-800 mb-1"
+                        className="block text-right text-sm font-medium text-gray-300 mb-1"
                     >
                         {label}
                         {required && <span className="text-red-500 ml-1">*</span>}
