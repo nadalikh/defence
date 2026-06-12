@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useCompass} from "@/components/compass/hooks/useCompass";
 import NumberRangeSelector from "@/components/rangeSelector/rangeSelector";
 import F35Jet from "@/components/compass/f35";
@@ -12,6 +12,7 @@ import Fpv from "@/components/compass/fpv";
 import Automatic from "@/components/compass/automatic";
 import Setting from "@/components/compass/setting";
 import Unknown from "@/components/compass/unknown";
+import {RadioGroup} from "@/components/radioButton/radioButton";
 
 enum Weapon {
     unKnown = 'unKnown',
@@ -68,6 +69,7 @@ export default function Compass() {
     const [continuousRotation, setContinuousRotation] = useState(0);
     const [selectedWeapon, setSelectedWeapon] = useState<Weapon>(Weapon.unKnown);
     const prevHeadingRef = useRef<number | null>(null);
+    const [isDamaged, setIsDamaged] = React.useState<string>('damaged');
 
     useEffect(() => {
         start()
@@ -179,6 +181,12 @@ export default function Compass() {
             <p className="bg-gray-100 px-4 py-1.5 rounded-full shadow-inner">
                 درجه: <span className="text-indigo-600 font-bold">{heading?.toFixed(0) ?? "--"}°</span>
             </p>
+            {
+                !isActivate &&
+                <div className={'mt-7 w-full flex justify-center '}>
+                    <NumberRangeSelector onChange={value => setHeading(value)}/>
+                </div>
+            }
             <div className={'flex flex-row gap-3'}>
                 <button onClick={() => setSelectedWeapon(Weapon.warPlaneFighter)}
                         className={`hover:cursor-pointer rounded-2xl bg-[#d1d1d1] shadow-md shadow-gray-800 flex justify-center ${isWarPlane ? "border border-red-900" : ""}`}>
@@ -206,14 +214,15 @@ export default function Compass() {
                 <div className={'mt-4'}>
                     {selectedWeaponComponent.component}
                     <span className={'text-center block w-full'}>{selectedWeaponComponent.info}</span>
+                    <RadioGroup
+                        options={[{label: 'تخریب داشت', value: 'damaged'}, {label: 'رد شد', value: 'passed'}]}
+                        value={isDamaged}
+                        onChange={setIsDamaged}
+                        name="options"
+                        orientation="vertical"
+                    />
                 </div>
             </div>
-            {
-                !isActivate &&
-                <div className={'mt-7 w-full flex justify-center '}>
-                    <NumberRangeSelector onChange={value => setHeading(value)}/>
-                </div>
-            }
         </div>
     );
 }

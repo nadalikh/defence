@@ -119,7 +119,7 @@ export default function Mapp() {
         <div className={"min-h-[35vh] h-[35vh] mt-auto relative"}>
             <button
                 onClick={() => {
-                    if (location.latitude && location.longitude) flyTo(location.latitude, location.longitude); else notif("موقعیت دستگاه شما پیدا نشده است", false)
+                    if (location.latitude && location.longitude) flyTo(location.latitude, location.longitude); else notif("موقعیت دستگاه شما پیدا نشده است", true)
                 }}
                 className={"absolute right-2 bottom-2 z-20 bg-white rounded-full"}>
                 <CurrentLocation/>

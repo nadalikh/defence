@@ -41,7 +41,6 @@ export const Input = forwardRef<HTMLInputElement, PasswordInputProps>(
 
         return (
             <div className={`w-full ${containerClassName}`}>
-                {/* Label */}
                 {label && (
                     <label
                         htmlFor={inputId}
