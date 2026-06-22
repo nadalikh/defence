@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import localFont from "next/font/local";
 import {ToastContainer} from "react-toastify";
+import ServiceWorkerRegister from "@/app/serviceWorkerRegister";
 export const metadata: Metadata = {
     title: "defence",
 };
@@ -27,7 +28,9 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
                 <ToastContainer />
                 <Image fill sizes={'auto'} loading="eager" className={'-z-20'} src={'/images/background1.jpg'} alt="background"/>
                 {children}
+            <ServiceWorkerRegister />
             </body>
         </html>
     );
 }
+//    "dev": "next dev --turbopack --experimental-https",
