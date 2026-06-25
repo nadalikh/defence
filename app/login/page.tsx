@@ -5,9 +5,13 @@ import {FiLogIn} from 'react-icons/fi';
 import {PasswordInput} from "@/components/passwordInput/passwordInput";
 import {Input} from "@/components/input/input";
 import {Button} from "@/components/button/button";
+import {fetchJson} from "@/app/utils/restUtils";
+import {notif} from "@/components/utils";
+import {useRouter} from 'next/navigation';
 
 const wrapperStyle = " mt-4"
 const mobileValidationError = "فرمت موبایل اشتباه است."
+
 export default function Login() {
     const [mobile, setMobile] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -20,15 +24,29 @@ export default function Login() {
             setHasMobileError(true)
         setMobile(value)
     }
+    const router = useRouter();
+    const sendLoginRequest = function () {
+        fetchJson<{ token: string }>('/auth/login/', {
+            method: "POST",
+            body: JSON.stringify({mobile, password}),
+            cacheDuration: 0,
+        }).then(res => {
+            router.push('/')
+        }).catch(err => {
+            notif(err.message, true)
+        });
+    }
 
     return (
-        <div className="bg-[#00437ebd] border border-blue-900 shadow-2xl shadow-black rounded-lg w-3/4 p-5 absolute top-1/2 left-1/2 transform -translate-1/2">
-            <Input label={'موبایل'} value={mobile} error={hasMobileError ? mobileValidationError : undefined} onChange={changePassword} placeholder="09*********"/>
+        <div
+            className="bg-[#00437ebd] border border-blue-900 shadow-2xl shadow-black rounded-lg w-3/4 p-5 absolute top-1/2 left-1/2 transform -translate-1/2">
+            <Input label={'موبایل'} value={mobile} error={hasMobileError ? mobileValidationError : undefined}
+                   onChange={changePassword} placeholder="09*********"/>
             <div className={wrapperStyle}>
                 <PasswordInput label={'پسورد'} value={password} onChange={setPassword} placeholder={'******'}/>
             </div>
             <div className={"flex justify-center w-full" + wrapperStyle}>
-                <Button leftIcon={<FiLogIn/>}>ورود</Button>
+                <Button onClick={() => sendLoginRequest()} leftIcon={<FiLogIn/>}>ورود</Button>
             </div>
         </div>
     )

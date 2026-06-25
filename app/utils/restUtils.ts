@@ -1,6 +1,7 @@
 // utils/fetch.ts
 import {cache} from 'react';
-const url = ""
+
+export const baseUrl = 'https://api.haras-samin.ir/api/v1';
 // ----- Types -----
 type FetchOptions = Omit<RequestInit, 'signal'> & {
     timeout?: number;       // ms before aborting
@@ -9,6 +10,9 @@ type FetchOptions = Omit<RequestInit, 'signal'> & {
     cacheDuration?: number; // seconds (in‑memory TTL)
     dedupe?: boolean;       // deduplicate concurrent identical requests
 };
+
+
+type JangoError = { detail: string };
 
 type FetchResult<T> = {
     data: T;
@@ -29,6 +33,7 @@ const pendingRequests = new Map<string, Promise<Response>>();
 
 // ----- Core fetch function -----
 export async function fetchData<T = unknown>(
+    url: string,
     options: FetchOptions = {}
 ): Promise<FetchResult<T>> {
     const {
@@ -40,7 +45,7 @@ export async function fetchData<T = unknown>(
         ...fetchOptions
     } = options;
 
-    const cacheKey = `${url}_${JSON.stringify(fetchOptions)}`;
+    const cacheKey = `${baseUrl}${url}_${JSON.stringify(fetchOptions)}`;
 
     // 1. Check memory cache (only if cacheDuration > 0)
     if (cacheDuration > 0) {
@@ -70,9 +75,13 @@ export async function fetchData<T = unknown>(
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         try {
-            const response = await fetch(url, {
+            const response = await fetch(baseUrl + url, {
                 ...fetchOptions,
                 signal: controller.signal,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(fetchOptions.headers || {}),
+                },
                 // Use Next.js built‑in cache on the server (App Router)
                 ...(typeof window === 'undefined' && {
                     next: {
@@ -82,12 +91,12 @@ export async function fetchData<T = unknown>(
             });
 
             clearTimeout(timeoutId);
+            const data = (await response.json()) as (T | JangoError);
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`${(data as JangoError).detail}`);
             }
 
-            const data = (await response.json()) as T;
 
             // Cache the result
             if (cacheDuration > 0) {
@@ -97,14 +106,11 @@ export async function fetchData<T = unknown>(
                     ttl: cacheDuration,
                 });
             }
-
-            return {data, response};
+            return {data: (data as T), response};
 
         } catch (error: unknown) {
             clearTimeout(timeoutId);
-
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
             // Retry logic (only for network errors or 5xx)
             const isRetriable =
                 error instanceof Error &&
@@ -118,7 +124,7 @@ export async function fetchData<T = unknown>(
                 return performFetch(attempt + 1);
             }
 
-            throw new Error(`Fetch failed: ${errorMessage}`);
+            throw new Error(`${errorMessage}`);
         }
     };
 
@@ -136,17 +142,18 @@ export async function fetchData<T = unknown>(
 }
 
 // ----- Convenience wrapper (returns only data) -----
-export async function fetchJson<T = unknown>(
-    options?: FetchOptions
+export async function fetchJson<T = unknown>(url: string,
+                                             options?: FetchOptions
 ): Promise<T> {
-    const {data} = await fetchData<T>(options);
+    const {data} = await fetchData<T>(url, options);
     return data;
 }
 
 // ----- React Server Component helper (with `cache()`) -----
 export const cachedFetchJson = cache(async <T = unknown>(
+    url: string,
     options?: FetchOptions
 ): Promise<T> => {
     // `cache()` deduplicates across server renders; combine with our TTL if needed
-    return fetchJson<T>(options);
+    return fetchJson<T>(url, options);
 });

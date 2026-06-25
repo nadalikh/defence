@@ -66,7 +66,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         const isDisabled = disabled || isLoading;
 
         const baseStyles = `
-      inline-flex items-center justify-center
+      inline-flex items-center justify-center 
+      hover:cursor-pointer 
       font-medium relative
       transition-all duration-200 ease-in-out
       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900

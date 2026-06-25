@@ -12,6 +12,8 @@ import useLocation from "@/components/map/hook/useLocation";
 import {notif} from "@/components/utils";
 import markerIcon from "@/app/images/markerIcon.png"
 import currentLocationIcon from "@/app/images/bluecircle.png"
+import {setCoords} from "@/store/locationSlice";
+import {useDispatch} from "react-redux";
 
 interface Location {
     latitude: number;
@@ -38,12 +40,17 @@ export default function Mapp() {
     const mapRef = useRef<Map | null>(null);
     const centerMarkerRef = useRef<Feature<Point> | null>(null);
     const currentMarkerRef = useRef<Feature<Point> | null>(null);
+    const dispatch = useDispatch();
     const {location, handleGetLocation} = useLocation();
+
+    function updateLocation(lat: number, lng: number) {
+        dispatch(setCoords({lat, lng}));
+    }
+
     useEffect(() => {
         handleGetLocation()
     }, [])
     useEffect(() => {
-        console.log("curren location change", location);
         if (currentMarkerRef.current && location.latitude && location.longitude) {
             const newGeometry = new Point(fromLonLat([location.longitude, location.latitude]));
             currentMarkerRef.current.setGeometry(newGeometry);
@@ -107,6 +114,7 @@ export default function Mapp() {
             if (mapCenter) {
                 const [lng, lat] = toLonLat(mapCenter);
                 setCenter({latitude: lat, longitude: lng});
+                updateLocation(lat, lng)
                 if (centerMarkerRef.current) {
                     const newGeometry = new Point(fromLonLat([lng, lat]));
                     centerMarkerRef.current.setGeometry(newGeometry);

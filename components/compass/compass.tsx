@@ -13,6 +13,12 @@ import Automatic from "@/components/compass/automatic";
 import Setting from "@/components/compass/setting";
 import Unknown from "@/components/compass/unknown";
 import {RadioGroup} from "@/components/radioButton/radioButton";
+import {Button} from "@/components/button/button";
+import {FiCheck, FiLogIn} from "react-icons/fi";
+import {fetchJson} from "@/app/utils/restUtils";
+import {RootState} from "@/store/store";
+import {useSelector} from "react-redux";
+import {notif} from "@/components/utils";
 
 enum Weapon {
     unKnown = 'unKnown',
@@ -70,6 +76,25 @@ export default function Compass() {
     const [selectedWeapon, setSelectedWeapon] = useState<Weapon>(Weapon.unKnown);
     const prevHeadingRef = useRef<number | null>(null);
     const [isDamaged, setIsDamaged] = React.useState<string>('damaged');
+    const coords = useSelector((state: RootState) => state.location.coords);
+    const sendRegisterRequest = () => {
+        if (coords) {
+            fetchJson<{ data: string }>('/reports/submit/', {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: JSON.stringify({
+                    latitude: coords.lat,
+                    longitude: coords.lng,
+                })
+            }).then(res => {
+                console.log(res);
+            }).catch((err) => {
+                notif(err.message, true)
+            })
+        }
+    }
 
     useEffect(() => {
         start()
@@ -221,6 +246,9 @@ export default function Compass() {
                         name="options"
                         orientation="vertical"
                     />
+                    <div className={'flex justify-around my-2'}>
+                    <Button onClick={() => sendRegisterRequest()} leftIcon={<FiCheck/>}>ثبت</Button>
+                    </div>
                 </div>
             </div>
         </div>

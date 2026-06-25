@@ -58,7 +58,6 @@ export function useCompass() {
             alertShownRef.current = false;
             return;
         }
-        console.log("heading", heading, isActivate, alertShownRef, timeoutRef);
         if (!alertShownRef.current && !timeoutRef.current) {
             timeoutRef.current = setTimeout(() => {
                 if (heading === null || heading === undefined) {
