@@ -15,7 +15,7 @@ export type dv = typeof DeviceOrientationEvent & {
 
 export default function CompassPage() {
     const router = useRouter();
-    const [isAuthorized, setAuthorized] = useState(true);
+    const [isAuthorized, setAuthorized] = useState(false);
     async function enableCompass() {
         try {
             const DeviceOrientationEventIOS =
@@ -41,8 +41,8 @@ export default function CompassPage() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setAuthorized(true)
             enableCompass()
-        }else{}
-            // router.push("/login");
+        }else
+            router.push("/login");
     }, []);
 
     return (

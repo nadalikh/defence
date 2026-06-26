@@ -26,12 +26,19 @@ export default function Login() {
     }
     const router = useRouter();
     const sendLoginRequest = function () {
-        fetchJson<{ token: string }>('/auth/login/', {
+        fetchJson<{ access: string, user_id: number }>('/auth/login/', {
             method: "POST",
             body: JSON.stringify({mobile, password}),
             cacheDuration: 0,
         }).then(res => {
-            router.push('/')
+            const {access, user_id} = res
+            if (access && user_id) {
+                localStorage.setItem('token', access)
+                localStorage.setItem('user_id', user_id.toString())
+                router.push('/')
+            } else {
+                notif("اطلاعات هویتی ارسال نشد", true)
+            }
         }).catch(err => {
             notif(err.message, true)
         });

@@ -94,6 +94,9 @@ export async function fetchData<T = unknown>(
             const data = (await response.json()) as (T | JangoError);
 
             if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.replace("/login");
+                }
                 throw new Error(`${(data as JangoError).detail}`);
             }
 
