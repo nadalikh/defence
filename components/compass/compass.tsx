@@ -111,7 +111,7 @@ export default function Compass() {
                     latitude: coords.lat,
                     longitude: coords.lng,
                     aircraft_type: getFlyServerType(),
-                    direction: heading ? Math.fround(heading) : 0,
+                    direction: heading ? Math.floor(heading) : 0,
                     action_type: isDamaged ? 'عبور کرد' : 'تخریب کرد',
                 })
             }).then(res => {
