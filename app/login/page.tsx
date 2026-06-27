@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from "react";
-import {FiLogIn} from 'react-icons/fi';
+import {FiLoader, FiLogIn} from 'react-icons/fi';
 import {PasswordInput} from "@/components/passwordInput/passwordInput";
 import {Input} from "@/components/input/input";
 import {Button} from "@/components/button/button";
@@ -15,7 +15,9 @@ const mobileValidationError = "فرمت موبایل اشتباه است."
 export default function Login() {
     const [mobile, setMobile] = useState<string>('')
     const [password, setPassword] = useState<string>('')
-    const [hasMobileError, setHasMobileError] = useState<boolean>(false);
+    const [sendingRequest, setSendingRequest] = useState<boolean>(false);
+    const [hasMobileError, setHasMobileError] = useState<boolean>(false)
+
     const changePassword = (value: string) => {
         const hasError = !value.match(/^0[0-9]{10}$/)
         if (hasMobileError && !hasError)
@@ -26,6 +28,7 @@ export default function Login() {
     }
     const router = useRouter();
     const sendLoginRequest = function () {
+        setSendingRequest(true);
         fetchJson<{ access: string, user_id: number }>('/auth/login/', {
             method: "POST",
             body: JSON.stringify({mobile, password}),
@@ -39,8 +42,10 @@ export default function Login() {
             } else {
                 notif("اطلاعات هویتی ارسال نشد", true)
             }
+            setSendingRequest(false);
         }).catch(err => {
             notif(err.message, true)
+            setSendingRequest(false);
         });
     }
 
@@ -53,7 +58,7 @@ export default function Login() {
                 <PasswordInput label={'پسورد'} value={password} onChange={setPassword} placeholder={'******'}/>
             </div>
             <div className={"flex justify-center w-full" + wrapperStyle}>
-                <Button onClick={() => sendLoginRequest()} leftIcon={<FiLogIn/>}>ورود</Button>
+                <Button disabled={sendingRequest} onClick={() => sendLoginRequest()} leftIcon={sendingRequest ? <FiLoader /> : <FiLogIn/>}>ورود</Button>
             </div>
         </div>
     )

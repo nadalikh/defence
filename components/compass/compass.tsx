@@ -14,7 +14,7 @@ import Setting from "@/components/compass/setting";
 import Unknown from "@/components/compass/unknown";
 import {RadioGroup} from "@/components/radioButton/radioButton";
 import {Button} from "@/components/button/button";
-import {FiCheck} from "react-icons/fi";
+import {FiCheck, FiLoader} from "react-icons/fi";
 import {fetchJson} from "@/app/utils/restUtils";
 import {RootState} from "@/store/store";
 import {useSelector} from "react-redux";
@@ -74,6 +74,7 @@ export default function Compass() {
     const {heading, start, isActivate, stop, setHeading, setIsActivate} = useCompass();
 
     const [continuousRotation, setContinuousRotation] = useState(0);
+    const [sendingRequest, setSendingRequest] = useState<boolean>(false);
     const [selectedWeapon, setSelectedWeapon] = useState<Weapon>(Weapon.unKnown);
     const prevHeadingRef = useRef<number | null>(null);
     const [isDamaged, setIsDamaged] = React.useState<string>('damaged');
@@ -99,6 +100,7 @@ export default function Compass() {
 
     const sendRegisterRequest = () => {
         if (coords) {
+            setSendingRequest(true);
             fetchJson<{ aircraft_type: string }>('/reports/submit/', {
                 method: "POST",
                 headers: {
@@ -109,12 +111,14 @@ export default function Compass() {
                     latitude: coords.lat,
                     longitude: coords.lng,
                     aircraft_type: getFlyServerType(),
-                    direction: heading,
+                    direction: heading ? Math.fround(heading) : 0,
                     action_type: isDamaged ? 'عبور کرد' : 'تخریب کرد',
                 })
             }).then(res => {
+                setSendingRequest(false);
                 notif(`اطلاعات ${res.aircraft_type} ثبت شد`, false)
             }).catch((err) => {
+                setSendingRequest(false);
                 notif(err.message, true)
             })
         }
@@ -271,7 +275,7 @@ export default function Compass() {
                         orientation="vertical"
                     />
                     <div className={'flex justify-around my-2'}>
-                        <Button onClick={() => sendRegisterRequest()} leftIcon={<FiCheck/>}>ثبت</Button>
+                        <Button disabled={sendingRequest} onClick={() => sendRegisterRequest()} leftIcon={sendingRequest ? <FiLoader/> : <FiCheck/>}>ثبت</Button>
                     </div>
                 </div>
             </div>
